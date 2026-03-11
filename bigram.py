@@ -21,7 +21,7 @@ import torch.nn as nn
 from torch.nn import functional as F
 import matplotlib.pyplot as plt
 
-# ── Hyperparameters ────────────────────────────────────────────────────────────
+#  Hyperparameters 
 batch_size    = 32      # independent sequences processed in parallel
 block_size    = 8       # maximum context length
 max_iters     = 10_000
@@ -36,7 +36,7 @@ device = (
     "cpu"
 )
 torch.manual_seed(1337)
-# ──────────────────────────────────────────────────────────────────────────────
+# 
 
 with open("data/swahili.txt", "r", encoding="utf-8") as f:
     text = f.read()
@@ -111,7 +111,7 @@ class BigramLanguageModel(nn.Module):
         return idx
 
 
-# ── Training ──────────────────────────────────────────────────────────────────
+#  Training 
 model     = BigramLanguageModel().to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
@@ -136,7 +136,7 @@ for step in range(max_iters):
 
 print(f"\nFinal loss: {loss.item():.4f}")
 
-# ── Plot training curves ───────────────────────────────────────────────────────
+#  Plot training curves 
 plt.figure(figsize=(8, 4))
 plt.plot(steps_log, train_losses, label="train")
 plt.plot(steps_log, val_losses,   label="val")
@@ -148,7 +148,7 @@ plt.tight_layout()
 plt.savefig("bigram_loss.png", dpi=150)
 print("Saved bigram_loss.png")
 
-# ── Generate sample ───────────────────────────────────────────────────────────
-print("\n── Generated text (500 chars) ─────────────────────────────────────────")
+#  Generate sample 
+print("\n Generated text (500 chars) ")
 context = torch.zeros((1, 1), dtype=torch.long, device=device)
 print(decode(model.generate(context, max_new_tokens=500)[0].tolist()))

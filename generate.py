@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-# ── CLI args ───────────────────────────────────────────────────────────────────
+#  CLI args 
 parser = argparse.ArgumentParser(description="Generate Swahili text from a trained GPT checkpoint.")
 parser.add_argument("--checkpoint",   default="gpt_swahili.pt", help="Path to .pt checkpoint file")
 parser.add_argument("--tokens",       type=int,   default=500,  help="Number of characters to generate")
@@ -27,7 +27,7 @@ device = (
 )
 
 
-# ── Load checkpoint ────────────────────────────────────────────────────────────
+#  Load checkpoint 
 print(f"Loading checkpoint: {args.checkpoint}")
 ckpt = torch.load(args.checkpoint, map_location=device)
 
@@ -45,7 +45,7 @@ vocab_size = cfg["vocab_size"]
 dropout    = 0.0   # disabled at inference
 
 
-# ── Rebuild model ──────────────────────────────────────────────────────────────
+#  Rebuild model 
 class Head(nn.Module):
     def __init__(self, head_size):
         super().__init__()
@@ -137,7 +137,7 @@ model.load_state_dict(ckpt["model_state"])
 model.eval()
 print(f"Model loaded  ({sum(p.numel() for p in model.parameters()):,} parameters)\n")
 
-# ── Generate ───────────────────────────────────────────────────────────────────
+#  Generate 
 def generate(prompt: str = "", n_tokens: int = 500, temperature: float = 1.0) -> str:
     if prompt:
         tokens = encode(prompt)
@@ -149,7 +149,7 @@ def generate(prompt: str = "", n_tokens: int = 500, temperature: float = 1.0) ->
     return decode(out[0].tolist())
 
 
-# ── Interactive loop ───────────────────────────────────────────────────────────
+#  Interactive loop 
 if args.prompt:
     # single-shot mode
     print(generate(args.prompt, args.tokens, args.temperature))
