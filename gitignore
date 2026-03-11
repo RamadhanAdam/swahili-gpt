@@ -1,0 +1,27 @@
+# data (large files, generated locally)
+data/swahili.txt
+
+# model checkpoint (large binary)
+*.pt
+*.pth
+
+# plots (generated during training)
+*.png
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.env
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
