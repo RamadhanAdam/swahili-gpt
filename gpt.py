@@ -1,14 +1,14 @@
 """
-gpt.py  —  Character-level GPT Language Model
+gpt.py  —  Characterlevel GPT Language Model
 Trained on the Swahili News corpus.
 
-Architecture  (decoder-only Transformer)
------------------------------------------
+Architecture  (decoderonly Transformer)
+
   Token embedding    → vocab_size × n_embd
   Position embedding → block_size × n_embd
   N × Transformer Block:
-      LayerNorm → Multi-Head Self-Attention (causal) → residual
-      LayerNorm → Feed-Forward (4× expansion, ReLU)  → residual
+      LayerNorm → MultiHead SelfAttention (causal) → residual
+      LayerNorm → FeedForward (4× expansion, ReLU)  → residual
   LayerNorm → Linear head → vocab_size
 
 Default config trains a ~10M parameter model.
@@ -25,13 +25,13 @@ import torch.nn as nn
 from torch.nn import functional as F
 import matplotlib.pyplot as plt
 
-# ── Hyperparameters ────────────────────────────────────────────────────────────
+#  Hyperparameters 
 batch_size    = 64     # sequences per batch
 block_size    = 256    # context window (characters)
 max_iters     = 5_000
 eval_interval = 500
 eval_iters    = 200
-learning_rate = 3e-4
+learning_rate = 3e4
 
 n_embd   = 384
 n_head   = 6
@@ -46,12 +46,12 @@ device = (
     "cpu"
 )
 torch.manual_seed(344)
-# ──────────────────────────────────────────────────────────────────────────────
+# 
 
-with open("data/swahili.txt", "r", encoding="utf-8") as f:
+with open("data/swahili.txt", "r", encoding="utf8") as f:
     text = f.read()
 
-# character-level vocabulary
+# characterlevel vocabulary
 chars      = sorted(set(text))
 vocab_size = len(chars)
 stoi       = {ch: i for i, ch in enumerate(chars)}
@@ -68,7 +68,7 @@ val_data   = data[n:]
 
 def get_batch(split):
     src = train_data if split == "train" else val_data
-    ix  = torch.randint(len(src) - block_size, (batch_size,))
+    ix  = torch.randint(len(src)  block_size, (batch_size,))
     x   = torch.stack([src[i:i + block_size]         for i in ix])
     y   = torch.stack([src[i + 1:i + block_size + 1] for i in ix])
     return x.to(device), y.to(device)
@@ -89,10 +89,10 @@ def estimate_loss(model):
     return out
 
 
-# ── Model components ───────────────────────────────────────────────────────────
+#  Model components 
 
 class Head(nn.Module):
-    """Single causal self-attention head."""
+    """Single causal selfattention head."""
 
     def __init__(self, head_size):
         super().__init__()
@@ -100,7 +100,7 @@ class Head(nn.Module):
         self.query   = nn.Linear(n_embd, head_size, bias=False)
         self.value   = nn.Linear(n_embd, head_size, bias=False)
         self.dropout = nn.Dropout(dropout)
-        # causal mask: lower-triangular matrix stored as a non-parameter buffer
+        # causal mask: lowertriangular matrix stored as a nonparameter buffer
         self.register_buffer("tril", torch.tril(torch.ones(block_size, block_size)))
 
     def forward(self, x):
@@ -108,11 +108,11 @@ class Head(nn.Module):
         k = self.key(x)    # (B, T, head_size)
         q = self.query(x)  # (B, T, head_size)
 
-        # scaled dot-product attention
-        scale = C ** -0.5
-        wei   = q @ k.transpose(-2, -1) * scale             # (B, T, T)
-        wei   = wei.masked_fill(self.tril[:T, :T] == 0, float("-inf"))
-        wei   = F.softmax(wei, dim=-1)
+        # scaled dotproduct attention
+        scale = C ** 0.5
+        wei   = q @ k.transpose(2, 1) * scale             # (B, T, T)
+        wei   = wei.masked_fill(self.tril[:T, :T] == 0, float("inf"))
+        wei   = F.softmax(wei, dim=1)
         wei   = self.dropout(wei)
 
         v   = self.value(x)   # (B, T, head_size)
@@ -130,12 +130,12 @@ class MultiHeadAttention(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
-        out = torch.cat([h(x) for h in self.heads], dim=-1)
+        out = torch.cat([h(x) for h in self.heads], dim=1)
         return self.dropout(self.proj(out))
 
 
 class FeedForward(nn.Module):
-    """Position-wise feed-forward network (4× expansion)."""
+    """Positionwise feedforward network (4× expansion)."""
 
     def __init__(self, n_embd):
         super().__init__()
@@ -194,7 +194,7 @@ class GPTLanguageModel(nn.Module):
     @torch.no_grad()
     def generate(self, idx, max_new_tokens, temperature=1.0):
         """
-        Auto-regressive generation.
+        Autoregressive generation.
 
         Args:
             idx:            (B, T) seed token indices
@@ -202,16 +202,16 @@ class GPTLanguageModel(nn.Module):
             temperature:    >1 → more random, <1 → more focused
         """
         for _ in range(max_new_tokens):
-            idx_cond  = idx[:, -block_size:]
+            idx_cond  = idx[:, block_size:]
             logits, _ = self(idx_cond)
-            logits     = logits[:, -1, :] / temperature          # (B, C)
-            probs      = F.softmax(logits, dim=-1)
+            logits     = logits[:, 1, :] / temperature          # (B, C)
+            probs      = F.softmax(logits, dim=1)
             idx_next   = torch.multinomial(probs, num_samples=1)  # (B, 1)
             idx        = torch.cat((idx, idx_next), dim=1)
         return idx
 
 
-# ── Training ──────────────────────────────────────────────────────────────────
+#  Training 
 model     = GPTLanguageModel().to(device)
 n_params  = sum(p.numel() for p in model.parameters())
 optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
@@ -238,7 +238,7 @@ for step in range(max_iters):
 
 print(f"\nFinal loss: {loss.item():.4f}")
 
-# ── Save checkpoint ────────────────────────────────────────────────────────────
+#  Save checkpoint 
 torch.save({
     "model_state": model.state_dict(),
     "vocab":       {"stoi": stoi, "itos": itos},
@@ -249,19 +249,19 @@ torch.save({
 }, CHECKPOINT)
 print(f"Checkpoint saved → {CHECKPOINT}")
 
-# ── Plot training curves ───────────────────────────────────────────────────────
+#  Plot training curves 
 plt.figure(figsize=(8, 4))
 plt.plot(steps_log, train_losses, label="train")
 plt.plot(steps_log, val_losses,   label="val")
 plt.xlabel("Step")
-plt.ylabel("Cross-entropy loss")
+plt.ylabel("Crossentropy loss")
 plt.title("GPT — Swahili News Training Curve")
 plt.legend()
 plt.tight_layout()
 plt.savefig("gpt_loss.png", dpi=150)
 print("Saved gpt_loss.png")
 
-# ── Generate sample ───────────────────────────────────────────────────────────
-print("\n── Generated text (500 chars) ─────────────────────────────────────────")
+#  Generate sample 
+print("\n Generated text (500 chars) ")
 context = torch.zeros((1, 1), dtype=torch.long, device=device)
 print(decode(model.generate(context, max_new_tokens=500)[0].tolist()))
