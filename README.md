@@ -120,7 +120,7 @@ Open `swahili_gpt_training.ipynb` in Colab with a T4 GPU runtime. All steps are 
 
 Final loss: **2.2873**
 
-![Bigram Loss](bigram_loss.png)
+![Bigram Loss](assets/bigram_loss.png)
 
 **GPT model** — 5,000 steps, 11M parameters
 
@@ -132,7 +132,7 @@ Final loss: **2.2873**
 
 Final loss: **1.1500**
 
-![GPT Loss](gpt_loss.png)
+![GPT Loss](assets/gpt_loss.png)
 
 The GPT model achieves roughly half the loss of the bigram baseline, reflecting the Transformer's ability to model long-range character dependencies across a 256-character context window.
 
@@ -169,6 +169,10 @@ Input tokens
     -> Linear Head  (384 -> vocab_size)
     -> Cross-entropy loss
 ```
+
+### Architecture Diagram
+
+![Architecture](assets/architecture.png)
 
 Trained with AdamW (lr=3e-4), dropout=0.2, context window of 256 characters.
 
