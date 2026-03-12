@@ -5,9 +5,6 @@ data/swahili.txt
 *.pt
 *.pth
 
-# plots (generated during training)
-*.png
-
 # Python
 __pycache__/
 *.py[cod]
