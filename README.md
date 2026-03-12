@@ -35,6 +35,11 @@ Training a generative model on Swahili explores:
 
 The dataset is downloaded and prepared automatically by `data/prepare.py`.
 
+## Model Checkpoint
+
+- HuggingFace: [RamadhanZome/swahili-gpt](https://huggingface.co/RamadhanZome/swahili-gpt)
+- GitHub Releases: [v1.0](https://github.com/RamadhanAdam/swahili-gpt/releases/tag/v1.0)
+
 ---
 
 ## Project Structure
