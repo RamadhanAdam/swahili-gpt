@@ -47,7 +47,7 @@ swahili-gpt/
 ├── bigram.py                       # baseline bigram model
 ├── gpt.py                          # full GPT Transformer model
 ├── generate.py                     # interactive generation from saved checkpoint
-├── swahili-gpt-training.ipynb      # Colab training notebook
+├── swahili_gpt_training.ipynb      # Colab training notebook
 ├── requirements.txt
 ├── LICENSE
 └── README.md
@@ -104,7 +104,7 @@ python generate.py --temperature 0.8 --tokens 600
 
 ### 6. Run on Google Colab
 
-Open `swahili-gpt-training.ipynb` in Colab with a T4 GPU runtime. All steps are pre-configured — clone, prepare, train, and download plots in one session.
+Open `swahili_gpt_training.ipynb` in Colab with a T4 GPU runtime. All steps are pre-configured — clone, prepare, train, and download plots in one session.
 
 ---
 
